@@ -20,9 +20,6 @@
 		oneToAll,
 		plan,
 		type ElevationCosts,
-		type OneToAllData,
-		type Options,
-		type PlanData,
 		type PlanResponse,
 		type Itinerary,
 		type Mode,
@@ -77,6 +74,8 @@
 	const hasDark: boolean = Boolean(urlParams?.has('dark'));
 	const hasLight: boolean = Boolean(urlParams?.has('light'));
 	const isSmallScreen = browser && window.innerWidth < 768;
+	type OneToAllOptions = Parameters<typeof oneToAll>[0];
+	type PlanOptions = Parameters<typeof plan>[0];
 	let activeTab = $derived<'connections' | 'departures' | 'isochrones'>(
 		page.state.activeTab ??
 			(urlParams?.has('one')
@@ -90,8 +89,8 @@
 	let showMap = $state(!isSmallScreen);
 	let showRoutes = $state(false);
 	let routesOverlaySession = $state(0);
-	let lastOneToAllQuery: Options<OneToAllData> | undefined = undefined;
-	let lastPlanQuery: Options<PlanData> | undefined = undefined;
+	let lastOneToAllQuery: OneToAllOptions | undefined = undefined;
+	let lastPlanQuery: PlanOptions | undefined = undefined;
 	let serverConfig: ServerConfig | undefined = $state();
 	let dataLoaded: boolean = $state(false);
 
@@ -231,8 +230,8 @@
 			: undefined
 	);
 	let arriveBy = $state<boolean>(urlParams?.get('arriveBy') == 'true');
-	let algorithm = $state<PlanData['query']['algorithm']>(
-		(urlParams?.get('algorithm') ?? defaultQuery.algorithm) as PlanData['query']['algorithm']
+	let algorithm = $state<PlanOptions['query']['algorithm']>(
+		(urlParams?.get('algorithm') ?? defaultQuery.algorithm) as PlanOptions['query']['algorithm']
 	);
 	let useRoutedTransfers = $state(
 		urlParams?.get('useRoutedTransfers') == 'true' || defaultQuery.useRoutedTransfers
@@ -398,8 +397,8 @@
 						algorithm,
 						via: via ? via.map((v) => v.match?.id) : undefined,
 						viaMinimumStay
-					} as PlanData['query'])
-				} as Options<PlanData>)
+					} as PlanOptions['query'])
+				} as PlanOptions)
 			: undefined
 	);
 
@@ -426,7 +425,7 @@
 						ignorePreTransitRentalReturnConstraints,
 						ignorePostTransitRentalReturnConstraints
 					}
-				} as Options<OneToAllData>)
+				} as OneToAllOptions)
 			: undefined
 	);
 

@@ -1872,14 +1872,6 @@ export type PlanData = {
          */
         toPlace: string;
         /**
-         * Experimental. Search radius in meters around the `fromPlace` / `toPlace` coordinates.
-         * When set and the place is given as coordinates, all transit stops within
-         * this radius are used as start/end points with zero pre-transit/post-transit time.
-         * Works without OSM/street routing data loaded.
-         *
-         */
-        radius?: number;
-        /**
          * List of via stops to visit (only stop IDs, no coordinates allowed for now).
          * Also see the optional parameter `viaMinimumStay` to set a set a minimum stay duration for each via stop.
          *
