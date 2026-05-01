@@ -28,12 +28,14 @@
 		map,
 		bounds,
 		zoom,
-		shapesDebugEnabled = false
+		shapesDebugEnabled = false,
+		session = 0
 	}: {
 		map: maplibregl.Map | undefined;
 		bounds: maplibregl.LngLatBoundsLike | undefined;
 		zoom: number;
 		shapesDebugEnabled?: boolean;
+		session?: number;
 	} = $props();
 
 	const FETCH_PADDING_RATIO = 0.5;
@@ -76,8 +78,8 @@
 	};
 
 	let routesData = $state<RouteResponseData | null>(null);
-	let loadedBounds = $state<maplibregl.LngLatBounds | null>(null);
-	let loadedZoom = $state<number | null>(null);
+	let loadedBounds: maplibregl.LngLatBounds | null = null;
+	let loadedZoom: number | null = null;
 	let requestToken = 0;
 	let hoveredRouteIdx = $state<number | null>(null);
 	let downloadingRouteIdx = $state<number | null>(null);
@@ -429,11 +431,18 @@
 		};
 	};
 
+	import { untrack } from 'svelte';
+
+	let loadedSession = -1;
+
 	const fetchRoutes = async (mapBounds: maplibregl.LngLatBounds) => {
 		const expandedBounds = expandBounds(mapBounds);
-		const isBoundsContained = loadedBounds && boundsContain(loadedBounds, mapBounds);
-		const isZoomSufficient =
-			!routesData?.zoomFiltered || Math.floor(zoom) <= Math.floor(loadedZoom ?? 0);
+		const isBoundsContained = untrack(
+			() => session === loadedSession && loadedBounds && boundsContain(loadedBounds, mapBounds)
+		);
+		const isZoomSufficient = untrack(
+			() => !routesData?.zoomFiltered || Math.floor(zoom) <= Math.floor(loadedZoom ?? 0)
+		);
 
 		if (isBoundsContained && isZoomSufficient) {
 			return;
@@ -475,12 +484,14 @@
 		routesData = data;
 		loadedBounds = requestBounds;
 		loadedZoom = zoom;
+		loadedSession = session;
 	};
 
 	$effect(() => {
+		const _session = session; // track session to re-run when the overlay is re-enabled
 		if (map && bounds && !focusedRouteData) {
 			const b = maplibregl.LngLatBounds.convert(bounds);
-			fetchRoutes(b);
+			void fetchRoutes(b);
 		}
 	});
 

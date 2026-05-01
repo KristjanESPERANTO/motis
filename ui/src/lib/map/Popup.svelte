@@ -89,15 +89,14 @@
 
 	let initialized = false;
 	$effect(() => {
-		if (ctx.map) {
-			if (!initialized) {
-				if (layer) {
-					ctx.map.on(trigger, layer.id, onTrigger);
-					ctx.map.on('mouseenter', layer.id, onMouseEnter);
-					ctx.map.on('mouseleave', layer.id, onMouseLeave);
-				} else {
-					ctx.map.on(trigger, onTrigger);
-				}
+		if (ctx.map && !initialized) {
+			if (layer) {
+				if (!layer.id) return; // wait until Layer has added itself to the map
+				ctx.map.on(trigger, layer.id, onTrigger);
+				ctx.map.on('mouseenter', layer.id, onMouseEnter);
+				ctx.map.on('mouseleave', layer.id, onMouseLeave);
+			} else {
+				ctx.map.on(trigger, onTrigger);
 			}
 			initialized = true;
 		}

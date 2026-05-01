@@ -1834,17 +1834,6 @@ export type RouteInfo = {
     segments: Array<RouteSegment>;
 };
 
-export type HealthResponse = {
-    /**
-     * GTFSRT, SIRI Lite, VDV AUS, VDV454 feeds.
-     */
-    rt?: boolean;
-    /**
-     * GBFS feeds.
-     */
-    gbfs?: boolean;
-};
-
 export type PlanData = {
     body?: never;
     path?: never;
@@ -1871,6 +1860,14 @@ export type PlanData = {
          *
          */
         toPlace: string;
+        /**
+         * Experimental. Search radius in meters around the `fromPlace` / `toPlace` coordinates.
+         * When set and the place is given as coordinates, all transit stops within
+         * this radius are used as start/end points with zero pre-transit/post-transit time.
+         * Works without OSM/street routing data loaded.
+         *
+         */
+        radius?: number;
         /**
          * List of via stops to visit (only stop IDs, no coordinates allowed for now).
          * Also see the optional parameter `viaMinimumStay` to set a set a minimum stay duration for each via stop.
@@ -3097,6 +3094,14 @@ export type ReverseGeocodeData = {
          *
          */
         type?: LocationType;
+        /**
+         * Optional. Number of results to return.
+         *
+         * If omitted, 5 results are returned by default.
+         * Must be <= server config variable `reverse_geocode_max_results`.
+         *
+         */
+        numResults?: number;
     };
     url: '/api/v1/reverse-geocode';
 };
@@ -3159,6 +3164,14 @@ export type GeocodeData = {
          *
          */
         placeBias?: number;
+        /**
+         * Optional. Number of suggestions to return.
+         *
+         * If omitted, 10 suggestions are returned by default.
+         * Must be <= server config variable `geocode_max_suggestions`.
+         *
+         */
+        numResults?: number;
     };
     url: '/api/v1/geocode';
 };
@@ -3687,6 +3700,62 @@ export type RoutesResponses = {
 
 export type RoutesResponse = RoutesResponses[keyof RoutesResponses];
 
+export type RouteDetailsData = {
+    body?: never;
+    path?: never;
+    query: {
+        /**
+         * Internal route index
+         */
+        routeIdx: number;
+        /**
+         * language tags as used in OpenStreetMap / GTFS
+         * (usually BCP-47 / ISO 639-1, or ISO 639-2 if there's no ISO 639-1)
+         *
+         */
+        language?: Array<string>;
+    };
+    url: '/api/experimental/map/route-details';
+};
+
+export type RouteDetailsErrors = {
+    /**
+     * Bad Request
+     */
+    400: Error;
+    /**
+     * Not Found
+     */
+    404: Error;
+    /**
+     * Unprocessable Entity
+     */
+    422: Error;
+    /**
+     * Server Error
+     */
+    500: Error;
+};
+
+export type RouteDetailsError = RouteDetailsErrors[keyof RouteDetailsErrors];
+
+export type RouteDetailsResponses = {
+    /**
+     * full data for a single route
+     */
+    200: {
+        routes: Array<RouteInfo>;
+        polylines: Array<RoutePolyline>;
+        stops: Array<Place>;
+        /**
+         * Always false for this endpoint.
+         */
+        zoomFiltered: boolean;
+    };
+};
+
+export type RouteDetailsResponse = RouteDetailsResponses[keyof RouteDetailsResponses];
+
 export type RentalsData = {
     body?: never;
     path?: never;
@@ -3776,10 +3845,6 @@ export type RentalsResponses = {
 };
 
 export type RentalsResponse = RentalsResponses[keyof RentalsResponses];
-
-export type HealthResponse2 = (HealthResponse);
-
-export type HealthError = (HealthResponse);
 
 export type TransfersData = {
     body?: never;
