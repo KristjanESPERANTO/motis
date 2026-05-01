@@ -312,6 +312,21 @@
 {/if}
 
 {#if debug}
+	{#if !id && !elevator}
+		<Control position="bottom-right">
+			<Card.Root class="w-[320px] mb-4 bg-background/95">
+				<Card.Content class="p-4 text-sm space-y-2">
+					<p class="font-semibold">Debug mode enabled</p>
+					{#if zoom > 15}
+						<p>Click a debug point on the map to open details.</p>
+					{:else}
+						<p>Zoom in further to load graph and elevator debug layers.</p>
+					{/if}
+				</Card.Content>
+			</Card.Root>
+		</Control>
+	{/if}
+
 	{#if fps}
 		{#await fps then f}
 			{#if f}
