@@ -1830,6 +1830,17 @@ export type RouteInfo = {
     segments: Array<RouteSegment>;
 };
 
+export type HealthResponse = {
+    /**
+     * GTFSRT, SIRI Lite, VDV AUS, VDV454 feeds.
+     */
+    rt?: boolean;
+    /**
+     * GBFS feeds.
+     */
+    gbfs?: boolean;
+};
+
 export type PlanData = {
     query: {
         /**
@@ -3382,6 +3393,10 @@ export type RentalsResponse = ({
 });
 
 export type RentalsError = (Error);
+
+export type HealthResponse2 = (HealthResponse);
+
+export type HealthError = (HealthResponse);
 
 export type TransfersData = {
     query: {
