@@ -4,11 +4,11 @@ import {
 	client,
 	trips,
 	type Mode,
+	type Options,
 	type TripsData,
 	type TripSegment
 } from '@motis-project/motis-client';
 import type { Trip, TransferData, MetaData } from './types';
-import type { QuerySerializerOptions } from '@hey-api/client-fetch';
 import { getDelayColor, hexToRgb } from './Color';
 import { getModeStyle, getColor } from './modeStyle';
 
@@ -55,7 +55,8 @@ let status: number;
 const tripsMap = new Map<string, Trip>();
 const metaDataMap = new Map<string, MetaData>();
 let metadata: MetaData[] = [];
-const fetchData = async (query: TripsData) => {
+
+const fetchData = async (query: Options<TripsData>) => {
 	const { data, response } = await trips(query);
 	status = response.status;
 	if (!data) return;
@@ -291,12 +292,12 @@ function updateState(data: TransferData, colorMode: string) {
 self.onmessage = async (e) => {
 	switch (e.data.type) {
 		case 'init': {
-			const querySerializer = { array: { explode: false } } as QuerySerializerOptions;
+			const querySerializer = { array: { explode: false } };
 			client.setConfig({ baseUrl: e.data.baseUrl, querySerializer });
 			break;
 		}
 		case 'fetch':
-			await fetchData({ query: e.data.query });
+			await fetchData({ query: e.data.query } as Options<TripsData>);
 			postMessage({ type: 'fetch-complete', status });
 			break;
 		case 'update': {

@@ -21,11 +21,12 @@
 		plan,
 		type ElevationCosts,
 		type OneToAllData,
+		type Options,
+		type PlanData,
 		type PlanResponse,
 		type Itinerary,
 		type Mode,
 		type PedestrianProfile,
-		type PlanData,
 		type ReachablePlace,
 		type RentalFormFactor,
 		type ServerConfig
@@ -88,8 +89,9 @@
 	let colorMode = $state<'rt' | 'route' | 'mode' | 'none'>(isSmallScreen ? 'none' : 'rt');
 	let showMap = $state(!isSmallScreen);
 	let showRoutes = $state(false);
-	let lastOneToAllQuery: OneToAllData | undefined = undefined;
-	let lastPlanQuery: PlanData | undefined = undefined;
+	let routesOverlaySession = $state(0);
+	let lastOneToAllQuery: Options<OneToAllData> | undefined = undefined;
+	let lastPlanQuery: Options<PlanData> | undefined = undefined;
 	let serverConfig: ServerConfig | undefined = $state();
 	let dataLoaded: boolean = $state(false);
 
@@ -397,7 +399,7 @@
 						via: via ? via.map((v) => v.match?.id) : undefined,
 						viaMinimumStay
 					} as PlanData['query'])
-				} as PlanData)
+				} as Options<PlanData>)
 			: undefined
 	);
 
@@ -424,7 +426,7 @@
 						ignorePreTransitRentalReturnConstraints,
 						ignorePostTransitRentalReturnConstraints
 					}
-				} as OneToAllData)
+				} as Options<OneToAllData>)
 			: undefined
 	);
 
@@ -469,14 +471,21 @@
 				isochronesOptions.errorMessage = undefined;
 				isochronesQueryTimeout = setTimeout(async () => {
 					try {
-						const { data, error, response } = await oneToAll(isochronesQuery);
-						if (error) {
+						const result = await oneToAll(isochronesQuery);
+						if ('error' in result && result.error) {
 							isochronesOptions.status = 'FAILED';
-							isochronesOptions.errorCode = response.status;
-							isochronesOptions.errorMessage = error.error;
+							isochronesOptions.errorCode = result.response.status;
+							isochronesOptions.errorMessage = result.error.error;
 							return;
 						}
-						const all = data!.all!.map((p: ReachablePlace) => {
+						const data = result.data;
+						if (!data) {
+							isochronesOptions.status = 'FAILED';
+							isochronesOptions.errorCode = 500;
+							isochronesOptions.errorMessage = 'Missing isochrones data';
+							return;
+						}
+						const all = data.all!.map((p: ReachablePlace) => {
 							return {
 								lat: p.place?.lat,
 								lng: p.place?.lon,

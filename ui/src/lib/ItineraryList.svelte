@@ -8,6 +8,7 @@
 		plan,
 		type Itinerary,
 		type Leg,
+		type Options,
 		type PlanData,
 		type PlanError,
 		type PlanResponse,
@@ -17,7 +18,6 @@
 	import { LoaderCircle } from '@lucide/svelte';
 	import { t } from '$lib/i18n/translation';
 	import DirectConnection from '$lib/DirectConnection.svelte';
-	import type { RequestResult } from '@hey-api/client-fetch';
 
 	let {
 		routingResponses,
@@ -26,16 +26,16 @@
 		selectItinerary,
 		updateStartDest
 	}: {
+		baseQuery: Options<PlanData> | undefined;
 		routingResponses: Array<Promise<PlanResponse>>;
 		baseResponse: Promise<PlanResponse> | undefined;
-		baseQuery: PlanData | undefined;
 		selectItinerary: (it: Itinerary) => void;
-		updateStartDest: (r: Awaited<RequestResult<PlanResponse, ApiError, false>>) => PlanResponse;
+		updateStartDest: (r: Awaited<ReturnType<typeof plan>>) => PlanResponse;
 	} = $props();
 
-	const throwOnError = (promise: RequestResult<PlanResponse, PlanError, false>) =>
+	const throwOnError = (promise: ReturnType<typeof plan>) =>
 		promise.then((res) => {
-			if (res.error) {
+			if ('error' in res && res.error) {
 				throw { error: res.error.error, status: res.response.status };
 			}
 			return res;
