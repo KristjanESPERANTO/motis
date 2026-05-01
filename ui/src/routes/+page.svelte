@@ -110,6 +110,7 @@
 	}
 
 	let withHillshades = $state(false);
+	let hillshadesUnavailable = $state(false);
 	let center = $state.raw<[number, number]>([2.258882912876089, 48.72559118651327]);
 	let level = $state(0);
 	let zoom = $state(15);
@@ -139,6 +140,26 @@
 	const getLocation = () => {
 		geolocate.trigger();
 	};
+
+	$effect(() => {
+		if (!map) {
+			return;
+		}
+
+		const onMapError = (event: maplibregl.ErrorEvent & { sourceId?: string }) => {
+			if (event.sourceId === 'hillshadeSource') {
+				hillshadesUnavailable = true;
+				withHillshades = false;
+				console.warn('Hillshades disabled because the external DEM tiles could not be loaded.');
+			}
+		};
+
+		map.on('error', onMapError);
+
+		return () => {
+			map.off('error', onMapError);
+		};
+	});
 
 	onMount(async () => {
 		initial().then((d) => {
@@ -878,6 +899,10 @@
 			<Button
 				size="icon"
 				variant={withHillshades ? 'default' : 'outline'}
+				disabled={hillshadesUnavailable}
+				title={hillshadesUnavailable
+					? 'Hillshades are currently unavailable because the external terrain tiles could not be loaded.'
+					: undefined}
 				onclick={() => (withHillshades = !withHillshades)}
 			>
 				<MountainSnow class="w-5 h-5" />

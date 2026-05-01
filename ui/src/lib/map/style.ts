@@ -146,7 +146,10 @@ export const getStyle = (
 		? {
 				hillshadeSource: {
 					type: 'raster-dem',
-					url: 'https://tiles.mapterhorn.com/tilejson.json'
+					tiles: ['https://tiles.mapterhorn.com/{z}/{x}/{y}.webp'],
+					tileSize: 512,
+					encoding: 'terrarium',
+					attribution: "<a href='https://mapterhorn.com/attribution'>© Mapterhorn</a>"
 				} satisfies RasterDEMSourceSpecification
 			}
 		: {};
