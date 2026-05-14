@@ -31,14 +31,7 @@ export const createClient = (config: Config = {}): Client => {
 
   const interceptors = createInterceptors<Request, Response, unknown, ResolvedRequestOptions>();
 
-  const beforeRequest = async <
-    TData = unknown,
-    TResponseStyle extends 'data' | 'fields' = 'fields',
-    ThrowOnError extends boolean = boolean,
-    Url extends string = string,
-  >(
-    options: RequestOptions<TData, TResponseStyle, ThrowOnError, Url>,
-  ) => {
+  const beforeRequest = async (options: RequestOptions) => {
     const opts = {
       ..._config,
       ...options,
@@ -67,14 +60,13 @@ export const createClient = (config: Config = {}): Client => {
       opts.headers.delete('Content-Type');
     }
 
-    const resolvedOpts = opts as typeof opts &
-      ResolvedRequestOptions<TResponseStyle, ThrowOnError, Url>;
-    const url = buildUrl(resolvedOpts);
+    const url = buildUrl(opts);
 
-    return { opts: resolvedOpts, url };
+    return { opts, url };
   };
 
   const request: Client['request'] = async (options) => {
+    // @ts-expect-error
     const { opts, url } = await beforeRequest(options);
     const requestInit: ReqInit = {
       redirect: 'follow',

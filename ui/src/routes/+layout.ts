@@ -21,6 +21,6 @@ if (browser) {
 			baseUrl = motisParam;
 		}
 	}
-	const querySerializer = { array: { explode: false } };
+	const querySerializer = { array: { explode: false, style: 'form' as const } };
 	client.setConfig({ baseUrl, querySerializer }); //`${window.location}`
 }

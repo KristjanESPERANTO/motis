@@ -8,7 +8,6 @@
 		plan,
 		type Itinerary,
 		type Leg,
-		type Options,
 		type PlanData,
 		type PlanError,
 		type PlanResponse,
@@ -26,7 +25,7 @@
 		selectItinerary,
 		updateStartDest
 	}: {
-		baseQuery: Options<PlanData> | undefined;
+		baseQuery: Parameters<typeof plan>[0] | undefined;
 		routingResponses: Array<Promise<PlanResponse>>;
 		baseResponse: Promise<PlanResponse> | undefined;
 		selectItinerary: (it: Itinerary) => void;
