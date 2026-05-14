@@ -862,6 +862,7 @@
 					variant={showRoutes ? 'default' : 'outline'}
 					aria-label="Toggle routes overlay"
 					onclick={() => {
+						if (!showRoutes) routesOverlaySession++;
 						showRoutes = !showRoutes;
 					}}
 				>
@@ -941,10 +942,12 @@
 					</Button>
 				</Control>
 				{#if showRoutes}
+					<div data-testid="routes-active" hidden></div>
 					<Routes
 						{map}
 						{bounds}
 						{zoom}
+						session={routesOverlaySession}
 						shapesDebugEnabled={serverConfig?.shapesDebugEnabled === true}
 					/>
 				{/if}
