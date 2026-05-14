@@ -26,6 +26,7 @@ const setupRoutesOverlayMocks = async (page: Page) => {
 		await route.fulfill({
 			status: 200,
 			contentType: 'application/json',
+			headers: { 'Cache-Control': 'no-store' },
 			body: JSON.stringify({
 				routes: [],
 				polylines: [],
@@ -80,9 +81,11 @@ test.describe('routes overlay toggle', () => {
 		// First enable: triggers the initial fetch.
 		await routesButton.click();
 		await expect.poll(() => getRoutesRequests()).toBeGreaterThanOrEqual(1);
+		await expect(page.getByTestId('routes-active')).toBeAttached();
 
 		// Disable, then re-enable: the overlay should re-mount and fetch again.
 		await routesButton.click();
+		await expect(page.getByTestId('routes-active')).not.toBeAttached();
 		await routesButton.click();
 
 		await expect.poll(() => getRoutesRequests()).toBeGreaterThanOrEqual(2);
