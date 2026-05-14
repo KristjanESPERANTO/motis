@@ -2,9 +2,9 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { GeocodeData, GeocodeErrors, GeocodeResponses, InitialData, InitialErrors, InitialResponses, LevelsData, LevelsErrors, LevelsResponses, OneToAllData, OneToAllErrors, OneToAllResponses, OneToManyData, OneToManyErrors, OneToManyIntermodalData, OneToManyIntermodalErrors, OneToManyIntermodalPostData, OneToManyIntermodalPostErrors, OneToManyIntermodalPostResponses, OneToManyIntermodalResponses, OneToManyPostData, OneToManyPostErrors, OneToManyPostResponses, OneToManyResponses, PlanData, PlanErrors, PlanResponses, RentalsData, RentalsErrors, RentalsResponses, ReverseGeocodeData, ReverseGeocodeErrors, ReverseGeocodeResponses, RoutesData, RoutesErrors, RoutesResponses, StopsData, StopsErrors, StopsResponses, StoptimesData, StoptimesErrors, StoptimesResponses, TransfersData, TransfersResponses, TripData, TripErrors, TripResponses, TripsData, TripsErrors, TripsResponses } from './types.gen';
+import type { GeocodeData, GeocodeErrors, GeocodeResponses, InitialData, InitialErrors, InitialResponses, LevelsData, LevelsErrors, LevelsResponses, OneToAllData, OneToAllErrors, OneToAllResponses, OneToManyData, OneToManyErrors, OneToManyIntermodalData, OneToManyIntermodalErrors, OneToManyIntermodalPostData, OneToManyIntermodalPostErrors, OneToManyIntermodalPostResponses, OneToManyIntermodalResponses, OneToManyPostData, OneToManyPostErrors, OneToManyPostResponses, OneToManyResponses, PlanData, PlanErrors, PlanResponses, RentalsData, RentalsErrors, RentalsResponses, ReverseGeocodeData, ReverseGeocodeErrors, ReverseGeocodeResponses, RouteDetailsData, RouteDetailsErrors, RouteDetailsResponses, RoutesData, RoutesErrors, RoutesResponses, StopsData, StopsErrors, StopsResponses, StoptimesData, StoptimesErrors, StoptimesResponses, TransfersData, TransfersResponses, TripData, TripErrors, TripResponses, TripsData, TripsErrors, TripsResponses } from './types.gen';
 
-export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
+export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
      * You can provide a client instance returned by `createClient()` instead of
      * individual options. This might be also useful if you want to implement a
@@ -193,6 +193,17 @@ export const levels = <ThrowOnError extends boolean = false>(options: Options<Le
 export const routes = <ThrowOnError extends boolean = false>(options: Options<RoutesData, ThrowOnError>) => (options.client ?? client).get<RoutesResponses, RoutesErrors, ThrowOnError>({
     querySerializer: { parameters: { language: { array: { explode: false } } } },
     url: '/api/experimental/map/routes',
+    ...options
+});
+
+/**
+ * Returns the full data for a single route, including all stops and
+ * polyline segments.
+ *
+ */
+export const routeDetails = <ThrowOnError extends boolean = false>(options: Options<RouteDetailsData, ThrowOnError>) => (options.client ?? client).get<RouteDetailsResponses, RouteDetailsErrors, ThrowOnError>({
+    querySerializer: { parameters: { language: { array: { explode: false } } } },
+    url: '/api/experimental/map/route-details',
     ...options
 });
 
