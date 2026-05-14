@@ -10,7 +10,6 @@
 	import Route from '$lib/Route.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { language, t } from '$lib/i18n/translation';
-	import type { RequestResult } from '@hey-api/client-fetch';
 	import { onClickStop, onClickTrip } from '$lib/utils';
 	import { getModeLabel } from './map/getModeLabel';
 	import { posToLocation } from './Location';
@@ -52,19 +51,22 @@
 	});
 	/* eslint-enable svelte/prefer-writable-derived */
 
-	const throwOnError = (promise: RequestResult<StoptimesResponse, StoptimesError, false>) =>
+	const throwOnError = (promise: ReturnType<typeof stoptimes>) =>
 		promise.then((response) => {
-			if (response.error) {
+			if ('error' in response && response.error) {
 				console.log(response.error);
 				throw { error: response.error.error, status: response.response.status };
 			}
-			stopNameFromResponse = response.data?.place?.name || '';
-			let placeFromResponse = response.data?.place;
+			if (!response.data?.place) {
+				throw { error: 'Missing stop data', status: response.response?.status ?? 500 };
+			}
+			stopNameFromResponse = response.data.place.name || '';
+			let placeFromResponse = response.data.place;
 			stop = posToLocation(
 				maplibregl.LngLat.convert([placeFromResponse.lon, placeFromResponse.lat])
 			);
 			stopMarker?.setLngLat(stop.match!);
-			return response.data!;
+			return response.data;
 		});
 </script>
 

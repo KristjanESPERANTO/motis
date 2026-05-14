@@ -1,6 +1,5 @@
 import { client } from '@motis-project/motis-client';
 import { browser } from '$app/environment';
-import type { QuerySerializerOptions } from '@hey-api/client-fetch';
 
 export const prerender = true;
 
@@ -22,6 +21,6 @@ if (browser) {
 			baseUrl = motisParam;
 		}
 	}
-	const querySerializer = { array: { explode: false } } as QuerySerializerOptions;
+	const querySerializer = { array: { explode: false } };
 	client.setConfig({ baseUrl, querySerializer }); //`${window.location}`
 }
