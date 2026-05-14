@@ -56,6 +56,10 @@ jobs:
         working-directory: ui
         run: pnpm run check
 
+      - name: Run Tests
+        working-directory: ui
+        run: pnpm run test
+
   formatting:
     runs-on: ubuntu-latest
     container: ghcr.io/motis-project/docker-cpp-build
